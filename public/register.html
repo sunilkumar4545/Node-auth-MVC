@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - Auth App</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 50px auto;
+        max-width: 400px;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+      }
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+      }
+      input {
+        margin-bottom: 15px;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+      }
+      button {
+        padding: 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      .message {
+        margin-top: 15px;
+        padding: 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        text-align: center;
+      }
+      .success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+      }
+      .error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+      }
+      .nav-links {
+        text-align: center;
+        margin-top: 20px;
+      }
+      .nav-links a {
+        color: #007bff;
+        text-decoration: none;
+        margin: 0 10px;
+      }
+      .nav-links a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Register</h1>
+
+    <form id="register-form">
+      <input type="text" name="name" placeholder="Full Name" required />
+      <input type="tel" name="mobile" placeholder="Mobile Number" required />
+      <input
+        type="password"
+        name="password"
+        placeholder="Password (min 6 chars)"
+        required
+      />
+      <input
+        type="password"
+        name="confirmPassword"
+        placeholder="Confirm Password"
+        required
+      />
+      <button type="submit">Register</button>
+    </form>
+
+    <div id="message" class="message" style="display: none"></div>
+
+    <div class="nav-links">
+      <a href="/login.html">Already have an account? Login</a>
+    </div>
+    <script>
+      document
+        .getElementById("register-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const formData = new FormData(e.target);
+          const data = {
+            name: formData.get("name"),
+            mobile: formData.get("mobile"),
+            password: formData.get("password"),
+            confirmPassword: formData.get("confirmPassword"),
+          };
+
+          const messageDiv = document.getElementById("message");
+          messageDiv.style.display = "none";
+
+          try {
+            const response = await fetch("/register", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            });
+
+            const result = await response.json();
+
+            messageDiv.style.display = "block";
+
+            if (response.ok) {
+              messageDiv.className = "message success";
+              messageDiv.textContent = result.message;
+              e.target.reset();
+
+              // Redirect to login after 2 seconds
+              setTimeout(() => {
+                window.location.href = "/login.html";
+              }, 2000);
+            } else {
+              messageDiv.className = "message error";
+              messageDiv.textContent = result.error || "Registration failed";
+            }
+          } catch (error) {
+            messageDiv.style.display = "block";
+            messageDiv.className = "message error";
+            messageDiv.textContent = "Network error. Please try again.";
+          }
+        });
+    </script>
+  </body>
+</html>
